@@ -1,0 +1,28 @@
+{
+  "name": "hady-cards-api",
+  "version": "1.0.0",
+  "description": "API profesional de cards para bots de WhatsApp usando Canvacard",
+  "main": "api/cards.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node api/cards.js",
+    "dev": "node api/cards.js"
+  },
+  "keywords": [
+    "canvacard",
+    "whatsapp-bot",
+    "rank-card",
+    "profile-card",
+    "welcome-card",
+    "image-api"
+  ],
+  "author": "devhades02",
+  "license": "MIT",
+  "dependencies": {
+    "canvacard": "^6.0.5",
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
