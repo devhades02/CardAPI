@@ -1,43 +1,62 @@
 const express = require("express")
 const router = express.Router()
 const canvacard = require("canvacard")
+const { registerFont } = require("canvas")
+const path = require("path")
+
+// registrar fuente
+registerFont(path.join(__dirname, "../fonts/Poppins.ttf"), {
+  family: "Poppins"
+})
 
 router.get("/", async (req, res) => {
 
 try {
 
-const author = req.query.author || "Unknown Artist"
-const album = req.query.album || "Unknown Album"
-const title = req.query.title || "Unknown Title"
-const image = req.query.image || "https://i.scdn.co/image/ab67616d00001e02e346fc6f767ca2ac8365fe60"
+const {
+author,
+title,
+album,
+image,
+duration,
+progress
+} = req.query
 
-// duración total en ms
-const duration = Number(req.query.duration) || 180000
+// valores por defecto
+const Author = author || "Unknown Artist"
+const Title = title || "Unknown Title"
+const Album = album || "Unknown Album"
+const Image = image || "https://i.scdn.co/image/ab67616d00001e02e346fc6f767ca2ac8365fe60"
+
+// duración total de la canción
+const Duration = Number(duration) || 180000
 
 // tiempo actual
-const progress = Number(req.query.progress) || 30000
+const Progress = Number(progress) || 30000
 
-const start = Date.now() - progress
-const end = start + duration
+// calcular timestamps
+const start = Date.now() - Progress
+const end = start + Duration
 
 const spotify = new canvacard.Spotify()
-
-.setAuthor(author)
-.setAlbum(album)
-.setTitle(title)
-.setImage(image)
+.setAuthor(Author)
+.setTitle(Title)
+.setAlbum(Album)
+.setImage(Image)
 .setStartTimestamp(start)
 .setEndTimestamp(end)
 
-const data = await spotify.build()
+// construir card
+const data = await spotify.build("Poppins")
 
 res.setHeader("Content-Type", "image/png")
 res.end(data)
 
-} catch (err) {
+} catch (error) {
 
 res.status(500).json({
-error: err.message
+status: false,
+error: error.message
 })
 
 }

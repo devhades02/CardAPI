@@ -1,66 +1,69 @@
-const express = require("express")
-const router = express.Router()
-const canvacard = require("canvacard")
-const { registerFont } = require("canvas")
-const path = require("path")
+import { createCanvas, loadImage } from "skia-canvas"
 
-// registrar fuente
-registerFont(path.join(__dirname, "../fonts/Poppins.ttf"), {
-  family: "Poppins"
-})
-
-router.get("/", async (req, res) => {
+export default async function handler(req, res) {
 
 try {
 
 const {
-author,
-title,
-album,
-image,
-duration,
-progress
+author = "Unknown Artist",
+title = "Unknown Title",
+album = "Unknown Album",
+image = "https://i.scdn.co/image/ab67616d00001e02e346fc6f767ca2ac8365fe60",
+duration = 180000,
+progress = 30000
 } = req.query
 
-// valores por defecto
-const Author = author || "Unknown Artist"
-const Title = title || "Unknown Title"
-const Album = album || "Unknown Album"
-const Image = image || "https://i.scdn.co/image/ab67616d00001e02e346fc6f767ca2ac8365fe60"
+const width = 800
+const height = 250
 
-// duración total de la canción
-const Duration = Number(duration) || 180000
+const canvas = createCanvas(width, height)
+const ctx = canvas.getContext("2d")
 
-// tiempo actual
-const Progress = Number(progress) || 30000
+// fondo
+ctx.fillStyle = "#121212"
+ctx.fillRect(0, 0, width, height)
 
-// calcular timestamps
-const start = Date.now() - Progress
-const end = start + Duration
+// portada
+const cover = await loadImage(image)
+ctx.drawImage(cover, 30, 30, 190, 190)
 
-const spotify = new canvacard.Spotify()
-.setAuthor(Author)
-.setTitle(Title)
-.setAlbum(Album)
-.setImage(Image)
-.setStartTimestamp(start)
-.setEndTimestamp(end)
+// textos
+ctx.fillStyle = "#ffffff"
+ctx.font = "bold 28px sans-serif"
+ctx.fillText(title, 250, 80)
 
-// construir card
-const data = await spotify.build("Poppins")
+ctx.fillStyle = "#b3b3b3"
+ctx.font = "22px sans-serif"
+ctx.fillText(author, 250, 120)
+
+ctx.font = "20px sans-serif"
+ctx.fillText(album, 250, 155)
+
+// barra progreso
+const barX = 250
+const barY = 190
+const barWidth = 500
+const barHeight = 10
+
+ctx.fillStyle = "#404040"
+ctx.fillRect(barX, barY, barWidth, barHeight)
+
+const percent = progress / duration
+ctx.fillStyle = "#1db954"
+ctx.fillRect(barX, barY, barWidth * percent, barHeight)
+
+// exportar imagen
+const buffer = await canvas.png
 
 res.setHeader("Content-Type", "image/png")
-res.end(data)
+res.send(buffer)
 
-} catch (error) {
+} catch (err) {
 
 res.status(500).json({
-status: false,
-error: error.message
+error: err.message
 })
 
 }
 
-})
-
-module.exports = router
+}
