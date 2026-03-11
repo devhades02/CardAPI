@@ -1,158 +1,103 @@
-const express = require("express")
-const canvacard = require("canvacard")
+import { Rank, Welcomer, LevelUp, Quote } from "canvacard"
 
-const app = express()
+export default async function handler(req, res) {
 
-/* HOME */
+try {
 
-app.get("/", (req,res)=>{
-res.json({
-creator: "devhades02",
-api: "Card API",
-status: "online",
-endpoints: [
-"/rank",
-"/profile",
-"/welcome",
-"/levelup",
-"/quote"
-]
-})
-})
+const { pathname } = new URL(req.url, `http://${req.headers.host}`)
+const params = new URLSearchParams(req.url.split("?")[1])
 
-/* RANK CARD */
+const avatar = params.get("avatar") || "https://i.imgur.com/1X6GQkS.jpg"
+const name = params.get("name") || "User"
+const level = Number(params.get("level")) || 1
+const xp = Number(params.get("xp")) || 0
+const text = params.get("text") || "Hola"
+const bg = params.get("bg")
 
-app.get("/rank", async (req,res)=>{
+// RANK
+if (pathname.includes("/rank")) {
 
-try{
-
-const avatar = req.query.avatar
-const name = req.query.name || "Usuario"
-const level = Number(req.query.level || 1)
-const xp = Number(req.query.xp || 0)
-
-if(!avatar) return res.json({error:"avatar requerido"})
-
-const card = await new canvacard.Rank()
+const card = await new Rank()
 .setAvatar(avatar)
 .setUsername(name)
+.setCurrentXP(xp)
+.setRequiredXP(1000)
 .setLevel(level)
-.setXP(xp)
 .build()
 
-res.set("Content-Type","image/png")
-res.send(card)
+res.setHeader("Content-Type", "image/png")
+return res.send(card)
 
-}catch(e){
-res.json({error:e.message})
 }
 
-})
+// PROFILE
+if (pathname.includes("/profile")) {
 
-/* PROFILE CARD */
-
-app.get("/profile", async (req,res)=>{
-
-try{
-
-const avatar = req.query.avatar
-const name = req.query.name || "Usuario"
-
-if(!avatar) return res.json({error:"avatar requerido"})
-
-const card = await new canvacard.Profile()
+const card = await new Rank()
 .setAvatar(avatar)
 .setUsername(name)
+.setCurrentXP(xp)
+.setRequiredXP(1000)
+.setLevel(level)
 .build()
 
-res.set("Content-Type","image/png")
-res.send(card)
+res.setHeader("Content-Type", "image/png")
+return res.send(card)
 
-}catch(e){
-res.json({error:e.message})
 }
 
-})
+// WELCOME
+if (pathname.includes("/welcome")) {
 
-/* WELCOME CARD */
-
-app.get("/welcome", async (req,res)=>{
-
-try{
-
-const avatar = req.query.avatar
-const name = req.query.name || "Nuevo Usuario"
-const bg = req.query.bg || "https://i.imgur.com/9R3sK9S.jpg"
-
-if(!avatar) return res.json({error:"avatar requerido"})
-
-const card = await new canvacard.Welcome()
+const card = await new Welcomer()
 .setAvatar(avatar)
 .setUsername(name)
-.setBackground(bg)
+.setBackground(bg || "https://i.imgur.com/9R3sK9S.jpg")
 .build()
 
-res.set("Content-Type","image/png")
-res.send(card)
+res.setHeader("Content-Type", "image/png")
+return res.send(card)
 
-}catch(e){
-res.json({error:e.message})
 }
 
-})
+// LEVELUP
+if (pathname.includes("/levelup")) {
 
-/* LEVEL UP */
-
-app.get("/levelup", async (req,res)=>{
-
-try{
-
-const avatar = req.query.avatar
-const name = req.query.name || "Usuario"
-const level = Number(req.query.level || 1)
-
-if(!avatar) return res.json({error:"avatar requerido"})
-
-const card = await new canvacard.LevelUp()
+const card = await new LevelUp()
 .setAvatar(avatar)
 .setUsername(name)
 .setLevel(level)
 .build()
 
-res.set("Content-Type","image/png")
-res.send(card)
+res.setHeader("Content-Type", "image/png")
+return res.send(card)
 
-}catch(e){
-res.json({error:e.message})
 }
 
-})
+// QUOTE
+if (pathname.includes("/quote")) {
 
-/* QUOTE CARD */
-
-app.get("/quote", async (req,res)=>{
-
-try{
-
-const avatar = req.query.avatar
-const name = req.query.name || "Usuario"
-const text = req.query.text || "Hola mundo"
-
-if(!avatar) return res.json({error:"avatar requerido"})
-
-const card = await new canvacard.Quote()
+const card = await new Quote()
 .setAvatar(avatar)
 .setUsername(name)
 .setText(text)
 .build()
 
-res.set("Content-Type","image/png")
-res.send(card)
+res.setHeader("Content-Type", "image/png")
+return res.send(card)
 
-}catch(e){
-res.json({error:e.message})
 }
 
+return res.status(404).json({
+error: "Endpoint no encontrado"
 })
 
-module.exports = app
+} catch (e) {
+
+return res.status(500).json({
+error: e.message
+})
+
+}
+
+}
