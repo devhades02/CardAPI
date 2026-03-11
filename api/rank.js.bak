@@ -27,6 +27,8 @@ const progress2 = req.query.progress2 || "#FF0000"
 
 const font = req.query.font || "Cascadia Code PL"
 
+const created = Number(req.query.created) || Date.now()
+
 const card = new canvacard.Rank()
 
 .setAvatar(avatar)
@@ -34,15 +36,25 @@ const card = new canvacard.Rank()
 if (banner) card.setBanner(banner, true)
 
 card
+
+.setBadges(["Developer","Supporter"], false, true)
+
 .setBorder([border1, border2], "vertical")
+
 .setCurrentXP(xp)
 .setRequiredXP(requiredxp)
+
 .setRank(rank, "RANK", true)
+
 .setLevel(level, "LEVEL")
+
 .setStatus(status)
+
 .setProgressBar([progress1, progress2], "GRADIENT", true)
+
 .setUsername(username, discriminator, "#FFFFFF")
-.setCreatedTimestamp(Date.now())
+
+.setCreatedTimestamp(created)
 
 const data = await card.build(font)
 
