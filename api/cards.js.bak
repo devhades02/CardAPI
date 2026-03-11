@@ -3,18 +3,17 @@ const canvacard = require("canvacard")
 
 const app = express()
 
-/* HOME */
-
 app.get("/", (req,res)=>{
 res.json({
 creator: "devhades02",
-api: "Card API",
-status: "online",
+api: "Hady Cards API",
+version: "1.0",
 endpoints: [
 "/rank",
 "/profile",
 "/welcome",
 "/levelup",
+"/goodbye",
 "/quote"
 ]
 })
@@ -24,14 +23,12 @@ endpoints: [
 
 app.get("/rank", async (req,res)=>{
 
+let avatar = req.query.avatar
+let name = req.query.name || "Usuario"
+let level = req.query.level || 1
+let xp = req.query.xp || 100
+
 try{
-
-const avatar = req.query.avatar
-const name = req.query.name || "Usuario"
-const level = Number(req.query.level || 1)
-const xp = Number(req.query.xp || 0)
-
-if(!avatar) return res.json({error:"avatar requerido"})
 
 const card = await new canvacard.Rank()
 .setAvatar(avatar)
@@ -49,16 +46,14 @@ res.json({error:e.message})
 
 })
 
-/* PROFILE CARD */
+/* PROFILE */
 
 app.get("/profile", async (req,res)=>{
 
+let avatar = req.query.avatar
+let name = req.query.name || "User"
+
 try{
-
-const avatar = req.query.avatar
-const name = req.query.name || "Usuario"
-
-if(!avatar) return res.json({error:"avatar requerido"})
 
 const card = await new canvacard.Profile()
 .setAvatar(avatar)
@@ -74,17 +69,15 @@ res.json({error:e.message})
 
 })
 
-/* WELCOME CARD */
+/* WELCOME */
 
 app.get("/welcome", async (req,res)=>{
 
+let avatar = req.query.avatar
+let name = req.query.name || "Nuevo Usuario"
+let bg = req.query.bg
+
 try{
-
-const avatar = req.query.avatar
-const name = req.query.name || "Nuevo Usuario"
-const bg = req.query.bg || "https://i.imgur.com/9R3sK9S.jpg"
-
-if(!avatar) return res.json({error:"avatar requerido"})
 
 const card = await new canvacard.Welcome()
 .setAvatar(avatar)
@@ -105,13 +98,11 @@ res.json({error:e.message})
 
 app.get("/levelup", async (req,res)=>{
 
+let avatar = req.query.avatar
+let name = req.query.name
+let level = req.query.level
+
 try{
-
-const avatar = req.query.avatar
-const name = req.query.name || "Usuario"
-const level = Number(req.query.level || 1)
-
-if(!avatar) return res.json({error:"avatar requerido"})
 
 const card = await new canvacard.LevelUp()
 .setAvatar(avatar)
@@ -128,17 +119,15 @@ res.json({error:e.message})
 
 })
 
-/* QUOTE CARD */
+/* QUOTE */
 
 app.get("/quote", async (req,res)=>{
 
+let avatar = req.query.avatar
+let name = req.query.name
+let text = req.query.text
+
 try{
-
-const avatar = req.query.avatar
-const name = req.query.name || "Usuario"
-const text = req.query.text || "Hola mundo"
-
-if(!avatar) return res.json({error:"avatar requerido"})
 
 const card = await new canvacard.Quote()
 .setAvatar(avatar)
