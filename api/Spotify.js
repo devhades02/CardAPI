@@ -6,18 +6,17 @@ router.get("/", async (req, res) => {
 
 try {
 
-const author = req.query.author || "Unknown Artist"
-const album = req.query.album || "Unknown Album"
-const title = req.query.title || "Unknown Song"
+const author = req.query.author ? decodeURIComponent(req.query.author) : "Unknown Artist"
+const album = req.query.album ? decodeURIComponent(req.query.album) : "Unknown Album"
+const title = req.query.title ? decodeURIComponent(req.query.title) : "Unknown Song"
 
 const image = req.query.image || "https://i.scdn.co/image/ab67616d00001e02e346fc6f767ca2ac8365fe60"
 
-const start = Number(req.query.start) || Date.now() - 10000
-const end = Number(req.query.end) || Date.now() + 60000
-
-const font = req.query.font || "Cascadia Code PL, Noto Color Emoji"
+const start = req.query.start ? Number(req.query.start) : Date.now() - 10000
+const end = req.query.end ? Number(req.query.end) : Date.now() + 60000
 
 const spotify = new canvacard.Spotify()
+
 .setAuthor(author)
 .setAlbum(album)
 .setTitle(title)
@@ -25,10 +24,10 @@ const spotify = new canvacard.Spotify()
 .setEndTimestamp(end)
 .setImage(image)
 
-const data = await spotify.build(font)
+const data = await spotify.build("Cascadia Code PL, Noto Color Emoji")
 
 res.setHeader("Content-Type", "image/png")
-res.send(data)
+res.end(data)
 
 } catch (err) {
 
